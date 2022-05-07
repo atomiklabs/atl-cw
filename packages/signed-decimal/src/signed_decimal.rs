@@ -1,4 +1,9 @@
-use std::str::FromStr;
+use std::{
+    fmt::{Display, Write},
+    iter::Sum,
+    ops::Add,
+    str::FromStr,
+};
 
 use cosmwasm_std::{Decimal, Uint128};
 
@@ -38,6 +43,18 @@ impl<TDecimal: FromStr> FromStr for SignedDecimal<TDecimal> {
     }
 }
 
+impl Display for SignedDecimal<Decimal> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NonNegative(n) => n.fmt(f),
+            Self::Negative(n) => {
+                f.write_char('-')?;
+                n.fmt(f)
+            }
+        }
+    }
+}
+
 impl SignedDecimal<Decimal> {
     pub const fn zero() -> Self {
         Self::NonNegative(Decimal::zero())
@@ -45,6 +62,22 @@ impl SignedDecimal<Decimal> {
 
     pub const fn one() -> Self {
         Self::NonNegative(Decimal::one())
+    }
+
+    pub fn is_positive(&self) -> bool {
+        if let Self::NonNegative(n) = self {
+            !n.is_zero()
+        } else {
+            false
+        }
+    }
+
+    pub fn is_negative(&self) -> bool {
+        if let Self::Negative(_) = self {
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -75,5 +108,107 @@ impl CwDecimal for SignedDecimal<Decimal> {
 
     fn from_ratio(numerator: impl Into<Self::CwInt>, denominator: impl Into<Self::CwInt>) -> Self {
         Self::NonNegative(Decimal::from_ratio(numerator, denominator))
+    }
+}
+
+impl Sum for SignedDecimal<Decimal> {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    mod display {
+        use std::str::FromStr;
+
+        use crate::signed_decimal::SignedDecimal;
+
+        #[test]
+        fn can_display_non_negative_value() {
+            assert_eq!(
+                format!("{}", SignedDecimal::from_str("123.3123143901").unwrap()),
+                "123.3123143901"
+            );
+
+            assert_eq!(format!("{}", SignedDecimal::zero()), "0");
+
+            assert_eq!(format!("{}", SignedDecimal::one()), "1");
+        }
+
+        #[test]
+        fn can_display_negative_value() {
+            assert_eq!(
+                format!("{}", SignedDecimal::from_str("-123.3123143901").unwrap()),
+                "-123.3123143901"
+            );
+        }
+
+        #[test]
+        fn uses_to_string() {
+            assert_eq!(
+                SignedDecimal::from_str("-123.3123143901").unwrap().to_string(),
+                "-123.3123143901"
+            );
+        }
+    }
+
+    mod aggregation {
+        use std::{vec, str::FromStr};
+
+        use crate::signed_decimal::SignedDecimal;
+
+        #[test]
+        fn can_calculate_sum() {
+            let ledger = vec![
+                SignedDecimal::from_str("-4.99").unwrap(),
+                SignedDecimal::from_str("1.99").unwrap(),
+                SignedDecimal::from_str("0.05399").unwrap(),
+                SignedDecimal::from_str("476.190000010047").unwrap(),
+            ];
+
+            let sum: SignedDecimal = ledger.into_iter().sum();
+
+            assert_eq!(SignedDecimal::from_str("473.243990010047").unwrap(), sum,);
+        }
+    }
+
+    mod utils {
+        use std::str::FromStr;
+
+        use crate::signed_decimal::SignedDecimal;
+
+        #[test]
+        fn allows_checking_sign() {
+            assert_eq!(
+                SignedDecimal::from_str("-1").unwrap().is_negative(),
+                true
+            );
+
+            assert_eq!(
+                SignedDecimal::from_str("-1").unwrap().is_positive(),
+                false
+            );
+
+            assert_eq!(
+                SignedDecimal::from_str("1").unwrap().is_negative(),
+                false
+            );
+
+            assert_eq!(
+                SignedDecimal::from_str("1").unwrap().is_positive(),
+                true
+            );
+
+            assert_eq!(
+                SignedDecimal::from_str("0").unwrap().is_positive(),
+                false
+            );
+
+            assert_eq!(
+                SignedDecimal::from_str("0").unwrap().is_negative(),
+                false
+            );
+        }
     }
 }
