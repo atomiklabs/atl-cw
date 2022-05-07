@@ -3,6 +3,13 @@
 version = 3
 
 [[package]]
+name = "atl-cw-signed-decimal"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-std",
+]
+
+[[package]]
 name = "base64"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -122,13 +129,6 @@ dependencies = [
  "rand_core 0.5.1",
  "subtle",
  "zeroize",
-]
-
-[[package]]
-name = "cw-signed-decimal"
-version = "0.1.0"
-dependencies = [
- "cosmwasm-std",
 ]
 
 [[package]]
