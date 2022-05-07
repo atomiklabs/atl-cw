@@ -10,7 +10,7 @@ pub enum SignedDecimal<TDecimal = Decimal> {
     Negative(TDecimal),
 }
 
-impl<TDecimal> From<TDecimal> for SignedDecimal<TDecimal>  {
+impl<TDecimal> From<TDecimal> for SignedDecimal<TDecimal> {
     fn from(n: TDecimal) -> Self {
         Self::NonNegative(n)
     }
@@ -38,7 +38,7 @@ impl<TDecimal: FromStr> FromStr for SignedDecimal<TDecimal> {
     }
 }
 
-impl SignedDecimal {
+impl SignedDecimal<Decimal> {
     pub const fn zero() -> Self {
         Self::NonNegative(Decimal::zero())
     }
@@ -48,7 +48,7 @@ impl SignedDecimal {
     }
 }
 
-impl CwDecimal for SignedDecimal {
+impl CwDecimal for SignedDecimal<Decimal> {
     type CwInt = Uint128;
 
     fn is_zero(&self) -> bool {

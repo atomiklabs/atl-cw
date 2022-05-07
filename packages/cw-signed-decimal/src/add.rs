@@ -44,7 +44,7 @@ mod tests {
 
     use crate::signed_decimal::SignedDecimal;
 
-    type SD = SignedDecimal::<Decimal>;
+    type SD = SignedDecimal<Decimal>;
 
     #[test]
     fn can_add_two_decimals_when_both_non_negative() {
