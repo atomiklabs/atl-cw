@@ -1,6 +1,6 @@
 [package]
 name = "cw-signed-decimal"
-version = "0.1."
+version = "0.1.0"
 authors = ["Tomasz Kopacki <tk-o@users.noreply.github.com>"]
 edition = "2018"
 description = "CosmWasm Signed Decimal"
