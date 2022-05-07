@@ -1,4 +1,4 @@
 mod add;
-mod cw_decimal;
-mod signed_decimal;
+pub mod cw_decimal;
+pub mod signed_decimal;
 mod sub;
