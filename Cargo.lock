@@ -3,6 +3,13 @@
 version = 3
 
 [[package]]
+name = "atl-cw-contract-interface"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-std",
+]
+
+[[package]]
 name = "atl-cw-signed-decimal"
 version = "0.1.0"
 dependencies = [

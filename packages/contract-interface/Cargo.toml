@@ -1,0 +1,11 @@
+[package]
+name = "atl-cw-contract-interface"
+version = "0.1.0"
+authors = ["Tomasz Kopacki <tk-o@users.noreply.github.com>"]
+edition = "2018"
+description = "CosmWasm Contract Interface"
+license = "Apache-2.0"
+repository = "https://github.com/atomiklabs/atl-cw"
+
+[dependencies]
+cosmwasm-std = { version = "0.16.7" }
